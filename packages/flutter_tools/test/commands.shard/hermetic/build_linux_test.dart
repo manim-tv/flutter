@@ -1255,5 +1255,8 @@ class CustomFakeOperatingSystemUtils extends Fake implements OperatingSystemUtil
   HostPlatform get hostPlatform => _hostPlatform;
 
   @override
+  File? which(String execName) => null;
+
+  @override
   List<File> whichAll(String execName) => <File>[];
 }

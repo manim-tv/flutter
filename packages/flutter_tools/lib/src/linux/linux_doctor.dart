@@ -129,6 +129,9 @@ class LinuxDoctorValidator extends DoctorValidator {
   static const kCmakeBinary = 'cmake';
   static const kNinjaBinary = 'ninja';
   static const kPkgConfigBinary = 'pkg-config';
+  static const kCcacheBinary = 'ccache';
+  static const kMoldBinary = 'mold';
+  static const kLldBinary = 'lld';
 
   final _requiredBinaryVersions = <String, Version>{
     kClangBinary: Version(3, 4, 0),
@@ -228,6 +231,20 @@ class LinuxDoctorValidator extends DoctorValidator {
             ValidationMessage.error(_userMessages.pkgConfigTooOld(requiredVersion.toString())),
           );
         }
+      }
+    }
+
+    // Messages for performance optimizations.
+    {
+      final bool hasCcache = await _hasBinary(kCcacheBinary);
+      final bool hasMold = await _hasBinary(kMoldBinary);
+      final bool hasLld = await _hasBinary(kLldBinary);
+
+      if (!hasCcache) {
+        messages.add(ValidationMessage.hint('ccache not found; install it for faster builds.'));
+      }
+      if (!hasMold && !hasLld) {
+        messages.add(ValidationMessage.hint('mold or lld not found; install one of them for faster linking.'));
       }
     }
 
@@ -334,6 +351,16 @@ class LinuxDoctorValidator extends DoctorValidator {
     }
 
     return ValidationResult(validationType, messages);
+  }
+
+  /// Returns whether [binary] is installed and executable.
+  Future<bool> _hasBinary(String binary) async {
+    try {
+      final ProcessResult result = await _processManager.run(<String>['which', binary]);
+      return result.exitCode == 0;
+    } on Exception {
+      return false;
+    }
   }
 
   /// Returns the installed version of [binary], or null if it's not installed.

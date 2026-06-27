@@ -169,23 +169,41 @@ Future<void> _runCmake(
   if (!globals.processManager.canRun('cmake')) {
     throwToolExit(globals.userMessages.cmakeMissing);
   }
+  final List<String> cmakeArgs = <String>[
+    'cmake',
+    '-G',
+    'Ninja',
+    '-DCMAKE_BUILD_TYPE=$buildFlag',
+    '-DFLUTTER_TARGET_PLATFORM=${targetPlatform.getName()}',
+    // Support cross-building for arm64 targets on x64 hosts.
+    // (Cross-building for x64 on arm64 hosts isn't supported now.)
+    if (needCrossBuild) '-DFLUTTER_TARGET_PLATFORM_SYSROOT=$targetSysroot',
+    if (needCrossBuildOptionsForArm64) '-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu',
+    if (needCrossBuildOptionsForArm64) '-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu',
+    // Support cross-building for riscv64 targets on x64 hosts.
+    if (needCrossBuildOptionsForRiscv64) '-DCMAKE_C_COMPILER_TARGET=riscv64-linux-gnu',
+    if (needCrossBuildOptionsForRiscv64) '-DCMAKE_CXX_COMPILER_TARGET=riscv64-linux-gnu',
+  ];
+
+  // Use a faster linker if available on the host.
+  if (globals.os.which('mold') != null) {
+    cmakeArgs.add('-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold');
+    cmakeArgs.add('-DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=mold');
+  } else if (globals.os.which('lld') != null) {
+    cmakeArgs.add('-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld');
+    cmakeArgs.add('-DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld');
+  }
+
+  // Use ccache if available on the host.
+  if (globals.os.which('ccache') != null) {
+    cmakeArgs.add('-DCMAKE_C_COMPILER_LAUNCHER=ccache');
+    cmakeArgs.add('-DCMAKE_CXX_COMPILER_LAUNCHER=ccache');
+  }
+
+  cmakeArgs.add(sourceDir.path);
+
   result = await globals.processUtils.stream(
-    <String>[
-      'cmake',
-      '-G',
-      'Ninja',
-      '-DCMAKE_BUILD_TYPE=$buildFlag',
-      '-DFLUTTER_TARGET_PLATFORM=${targetPlatform.getName()}',
-      // Support cross-building for arm64 targets on x64 hosts.
-      // (Cross-building for x64 on arm64 hosts isn't supported now.)
-      if (needCrossBuild) '-DFLUTTER_TARGET_PLATFORM_SYSROOT=$targetSysroot',
-      if (needCrossBuildOptionsForArm64) '-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu',
-      if (needCrossBuildOptionsForArm64) '-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu',
-      // Support cross-building for riscv64 targets on x64 hosts.
-      if (needCrossBuildOptionsForRiscv64) '-DCMAKE_C_COMPILER_TARGET=riscv64-linux-gnu',
-      if (needCrossBuildOptionsForRiscv64) '-DCMAKE_CXX_COMPILER_TARGET=riscv64-linux-gnu',
-      sourceDir.path,
-    ],
+    cmakeArgs,
     workingDirectory: buildDir.path,
     environment: <String, String>{'CC': 'clang', 'CXX': 'clang++'},
     trace: true,

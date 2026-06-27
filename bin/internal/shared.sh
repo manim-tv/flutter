@@ -176,7 +176,12 @@ function upgrade_flutter () (
     fi
 
     # Compile...
-    "$DART" --verbosity=error $FLUTTER_TOOL_ARGS --snapshot="$SNAPSHOT_PATH" --snapshot-kind="app-jit" --packages="$FLUTTER_TOOLS_DIR/.dart_tool/package_config.json" --no-enable-mirrors "$SCRIPT_PATH" > /dev/null
+    # On arm64 Linux, tune Dart VM for better performance during tool compilation.
+    local DART_VM_ARGS=""
+    if [[ "$(uname -m)" == "aarch64" && "$(uname -s)" == "Linux" ]]; then
+      DART_VM_ARGS="--old_gen_heap_size=2048 --background_compilation"
+    fi
+    "$DART" --verbosity=error $DART_VM_ARGS $FLUTTER_TOOL_ARGS --snapshot="$SNAPSHOT_PATH" --snapshot-kind="app-jit" --packages="$FLUTTER_TOOLS_DIR/.dart_tool/package_config.json" --no-enable-mirrors "$SCRIPT_PATH" > /dev/null
     echo "$compilekey" > "$STAMP_PATH"
 
     # Delete any temporary snapshot path.
@@ -270,7 +275,17 @@ function shared::execute() {
     flutter*)
       # FLUTTER_TOOL_ARGS aren't quoted below, because it is meant to be
       # considered as separate space-separated args.
-      exec "$DART" --packages="$FLUTTER_TOOLS_DIR/.dart_tool/package_config.json" $FLUTTER_TOOL_ARGS "$SNAPSHOT_PATH" "$@"
+      # On arm64 Linux, we can tune the Dart VM for better tool performance.
+      if [[ "$(uname -m)" == "aarch64" && "$(uname -s)" == "Linux" ]]; then
+        # Increase old space heap size to reduce GC frequency during heavy builds.
+        # Also enable background compilation for better responsiveness.
+        exec "$DART" --packages="$FLUTTER_TOOLS_DIR/.dart_tool/package_config.json" \
+          --old_gen_heap_size=2048 \
+          --background_compilation \
+          $FLUTTER_TOOL_ARGS "$SNAPSHOT_PATH" "$@"
+      else
+        exec "$DART" --packages="$FLUTTER_TOOLS_DIR/.dart_tool/package_config.json" $FLUTTER_TOOL_ARGS "$SNAPSHOT_PATH" "$@"
+      fi
       ;;
     dart*)
       exec "$DART" "$@"

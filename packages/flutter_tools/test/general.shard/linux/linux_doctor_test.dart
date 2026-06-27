@@ -179,6 +179,15 @@ List<FakeCommand> _gtkLibrariesMissingCommands() {
   ];
 }
 
+// A command that checks for the existence of a binary using 'which'.
+FakeCommand _whichCommand(String binary, {bool exists = true}) {
+  return FakeCommand(
+    command: <String>['which', binary],
+    exitCode: exists ? 0 : 1,
+    stdout: exists ? '/usr/bin/$binary' : '',
+  );
+}
+
 // A command that will failure when running '[binary] --version'.
 FakeCommand _missingBinaryCommand(String binary) {
   return FakeCommand(command: <String>[binary, '--version'], exitCode: 1);
@@ -201,6 +210,9 @@ void main() {
         _cmakePresentCommand('3.16.3'),
         _ninjaPresentCommand('1.10.0'),
         _pkgConfigPresentCommand('0.29'),
+        _whichCommand('ccache'),
+        _whichCommand('mold'),
+        _whichCommand('lld'),
         ..._gtkLibrariesPresentCommands(),
         _eglinfoPresentCommand(),
       ]);
@@ -234,6 +246,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -267,6 +282,9 @@ void main() {
       _cmakePresentCommand('3.2.0'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -300,6 +318,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('0.8.1'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -333,6 +354,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.27.0'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -367,6 +391,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _missingBinaryException('pkg-config'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       // We never check libraries because pkg-config is not present
     ]);
     final DoctorValidator linuxDoctorValidator = LinuxDoctorValidator(
@@ -390,6 +417,9 @@ void main() {
       _missingBinaryCommand('cmake'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -425,6 +455,9 @@ void main() {
       _cmakePresentCommand('bogus'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -460,6 +493,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -495,6 +531,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -530,6 +569,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _missingBinaryCommand('ninja'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -565,6 +607,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('bogus'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -600,6 +645,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _missingBinaryCommand('pkg-config'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -625,6 +673,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('bogus'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -650,6 +701,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesMissingCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -686,6 +740,9 @@ void main() {
       _missingBinaryCommand('cmake'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(),
     ]);
@@ -705,6 +762,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoMissingCommand(),
     ]);
@@ -730,6 +790,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(x11: false),
     ]);
@@ -764,6 +827,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(wayland: false),
     ]);
@@ -798,6 +864,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(es: false),
     ]);
@@ -827,6 +896,9 @@ void main() {
       _cmakePresentCommand('3.16.3'),
       _ninjaPresentCommand('1.10.0'),
       _pkgConfigPresentCommand('0.29'),
+      _whichCommand('ccache'),
+      _whichCommand('mold'),
+      _whichCommand('lld'),
       ..._gtkLibrariesPresentCommands(),
       _eglinfoPresentCommand(core: false),
     ]);
